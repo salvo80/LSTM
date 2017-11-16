@@ -2,6 +2,7 @@ import io
 
 import numpy as np
 import statsmodels.tsa.stattools as ts
+from statsmodels.tsa.stattools import acf
 
 from math import sqrt
 from numpy import concatenate
@@ -53,6 +54,17 @@ dataset.columns = ['no','open','close','high','low','volume']
 dataset.index.name = 'date'
 dataset.drop('no', axis=1, inplace=True)
 dataset.sort_index(inplace=True)
+
+# differentiate - must use where adf result[1]>0.05
+diff1 = dataset.diff()
+diff1.dropna(inplace=True)
+print(diff1)
+# re-testing ADF for stationarity (adf result[1] must be >0.05)
+print('open', ts.adfuller(np.array(diff1['open']), 1))
+
+# calculate ACF
+nlags = 20
+print(acf(diff1['open'], unbiased=True, nlags=nlags-1))
 
 values = dataset.values
 '''#plot all#
